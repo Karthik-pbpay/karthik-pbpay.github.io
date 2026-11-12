@@ -8,349 +8,514 @@
 <title>Karthik Babu Portfolio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
-/* Layout: single-theme "agent control plane". Animated node-field canvas behind glass panels; signature moment = NetOps agent swarm. */
+/* Layout: single dark theme. The page is "assembled" by six ops agents as you scroll: agent cursors, build tags, a build HUD.
+   Square terminal cards on a navy ground, one cyan-to-violet gradient reserved for the name and key words. */
 :root{
   color-scheme:dark;
-  --bg:#060914; --bg2:#0b1022; --glass:rgba(20,28,56,.55); --edge:rgba(120,160,255,.18);
-  --ink:#e8eefc; --muted:#8b97b8; --cyan:#3ee6ff; --violet:#9b7bff; --amber:#ffb547; --ok:#4cf2a0; --deny:#ff5c7a;
-  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
-  --f-body:"Inter",system-ui,-apple-system,sans-serif;
+  --bg:#060914; --bg2:#0a1020; --card:#0d1426; --raised:#121b33; --line:#1c2742;
+  --ink:#e8eefc; --head:#f4f7ff; --soft:#c3cce4; --muted:#8b97b8;
+  --cyan:#3ee6ff; --violet:#9b7bff; --term:#4cf2a0; --amber:#ffb547; --deny:#ff5c7a;
+  --grad:linear-gradient(110deg,var(--cyan),var(--violet));
+  --f-display:"Space Grotesk",system-ui,-apple-system,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-display);font-size:16px;line-height:1.6;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
 #field{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.glow{position:fixed;inset:-20% -10% auto auto;width:60vw;height:60vw;background:radial-gradient(closest-side,rgba(62,230,255,.12),transparent);z-index:0;pointer-events:none}
-.glow.b{inset:auto auto -25% -15%;background:radial-gradient(closest-side,rgba(155,123,255,.12),transparent)}
 .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+main{overflow-x:clip}
 a{color:var(--cyan)}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
-h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08}
-h2{font-size:clamp(1.6rem,3.6vw,2.4rem);font-weight:700;letter-spacing:-.01em}
-h3{font-size:1.02rem;font-weight:500}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08;color:var(--head)}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem);font-weight:700;letter-spacing:-.02em}
+h3{font-size:1.05rem;font-weight:600}
 p{margin:0}
-.mono{font-family:var(--f-mono)}
-.glass{background:var(--glass);border:1px solid var(--edge);border-radius:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px}
+.ok{color:var(--term)} .warn{color:var(--amber)} .dn{color:var(--deny)}
 
 /* nav */
-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:rgba(6,9,20,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
-nav .wrap{display:flex;align-items:center;gap:20px;height:60px}
-.logo{font-family:var(--f-display);font-weight:900;font-size:1rem;letter-spacing:.04em}
-.logo span{color:var(--cyan)}
-.links{display:flex;gap:20px;margin-left:auto;font-size:.86rem}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(6,9,20,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:14px;height:60px}
+.logo{font-weight:700;font-size:1.15rem;color:var(--head);text-decoration:none}
+.logo b{color:var(--cyan)}
+.links{display:flex;gap:22px;margin:0 auto;font-family:var(--f-mono);font-size:.78rem}
 .links a{color:var(--muted);text-decoration:none}
 .links a:hover{color:var(--ink)}
-.status{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.72rem;color:var(--ok);border:1px solid rgba(76,242,160,.3);padding:4px 10px;border-radius:99px;white-space:nowrap}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pulse 2s infinite}
-@keyframes pulse{50%{opacity:.35}}
+.kbtn{font:500 .76rem var(--f-mono);color:var(--soft);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:8px 11px;cursor:pointer;margin-left:auto}
+.links + .kbtn{margin-left:0}
+.kbtn:hover{border-color:var(--cyan)}
+.navcta{font:700 .76rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;background:var(--cyan);color:var(--bg);padding:10px 16px;border-radius:4px;text-decoration:none;white-space:nowrap}
 
 /* hero */
-.hero{padding-block:72px 48px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center}
+.hero{padding-block:64px 44px;display:grid;grid-template-columns:1.25fr 1fr;gap:44px;align-items:center}
 .hero>*{min-width:0}
-.tag{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
-.hero h1{font-size:clamp(2.6rem,7.5vw,5.4rem);font-weight:900;margin-top:16px;letter-spacing:-.02em}
-.grad{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-.typed{font-family:var(--f-mono);font-size:1.02rem;color:var(--muted);margin-top:18px;min-height:1.7em}
-.typed b{color:var(--ink);font-weight:500}
-.caret{display:inline-block;width:9px;height:1.1em;background:var(--cyan);vertical-align:-3px;margin-left:2px;animation:pulse 1s steps(1) infinite}
-.lede{font-size:1.08rem;max-width:54ch;margin-top:18px;color:#c3cce4}
-.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-.btn{font:600 .92rem var(--f-body);padding:12px 20px;border-radius:10px;border:1px solid var(--cyan);background:linear-gradient(135deg,rgba(62,230,255,.22),rgba(155,123,255,.22));color:var(--ink);cursor:pointer;text-decoration:none;transition:box-shadow .2s,transform .2s}
-.btn:hover{box-shadow:0 0 24px rgba(62,230,255,.35);transform:translateY(-1px)}
-.btn.ghost{background:transparent;border-color:var(--edge)}
+.prompt{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.1em;color:var(--term)}
+.prompt span{color:var(--muted);letter-spacing:0}
+.hero h1{font-size:clamp(3rem,9.4vw,6.2rem);font-weight:700;letter-spacing:-.035em;line-height:.95;margin-top:18px;text-transform:uppercase}
+.hero h1 i{font-style:normal;color:var(--cyan);-webkit-text-fill-color:var(--cyan)}
+.sub{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:600;color:var(--head);margin-top:18px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.pill{font-family:var(--f-mono);font-size:.74rem;color:var(--soft);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:6px 10px}
+.pill b{color:var(--term);font-weight:500}
+.lede{font-size:1.05rem;max-width:54ch;margin-top:20px;color:var(--soft)}
+.typed{font-family:var(--f-mono);font-size:.88rem;color:var(--term);margin-top:14px;min-height:1.7em}
+.caret{display:inline-block;width:8px;height:1.05em;background:var(--term);vertical-align:-3px;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.btn{font:700 .8rem var(--f-mono);letter-spacing:.04em;padding:13px 18px;border-radius:4px;border:1px solid var(--cyan);background:var(--cyan);color:var(--bg);cursor:pointer;text-decoration:none;transition:box-shadow .2s,transform .2s}
+.btn:hover{box-shadow:0 0 26px rgba(62,230,255,.4);transform:translateY(-1px)}
+.btn.ghost{background:var(--card);border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--cyan);box-shadow:none}
 .btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
-
-.card-id{padding:22px;position:relative;overflow:hidden}
-.card-id::after{content:"";position:absolute;left:0;right:0;top:-40%;height:40%;background:linear-gradient(transparent,rgba(62,230,255,.08),transparent);animation:scan 4s linear infinite}
+.hero-r{position:relative}
+#globe{position:absolute;left:50%;top:50%;width:150%;height:150%;transform:translate(-50%,-50%);pointer-events:none;opacity:.8}
+.card-id{position:relative;padding:20px 22px;overflow:hidden;background:rgba(13,20,38,.66);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.card-id::after{content:"";position:absolute;left:0;right:0;top:-40%;height:40%;background:linear-gradient(transparent,rgba(62,230,255,.09),transparent);animation:scan 4s linear infinite}
 @keyframes scan{to{top:110%}}
-.card-id .row{display:flex;justify-content:space-between;gap:12px;font-family:var(--f-mono);font-size:.8rem;padding-block:8px;border-bottom:1px dashed var(--edge)}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em}
+.card-head span:first-child{color:var(--muted)}
+.badge-live{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(76,242,160,.35);color:var(--term);padding:3px 8px;border-radius:3px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--term);box-shadow:0 0 10px var(--term);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.card-id .row{display:flex;justify-content:space-between;gap:12px;font-family:var(--f-mono);font-size:.78rem;padding-block:8px;border-bottom:1px dashed var(--line)}
 .card-id .row:last-child{border:0}
 .card-id .row span:first-child{color:var(--muted)}
 .card-id .row span:last-child{text-align:right}
-.ok{color:var(--ok)} .warn{color:var(--amber)} .dn{color:var(--deny)}
-.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.card-head span{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
 
-/* stats */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .stat{padding:20px}
-.stat b{display:block;font-family:var(--f-display);font-weight:700;font-size:2rem;font-variant-numeric:tabular-nums}
-.stat span{font-size:.84rem;color:var(--muted)}
-.note{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);margin-top:10px}
+.stat b{display:block;font-weight:700;font-size:2.3rem;line-height:1;color:var(--head);font-variant-numeric:tabular-nums}
+.stat b::after{content:attr(data-suffix);color:var(--cyan)}
+.stat span{display:block;margin-top:8px;font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.note{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);margin-top:12px}
 
-section{padding-block:88px 0}
-.sec-head{margin-bottom:28px;display:flex;flex-direction:column;gap:10px}
-.sec-head p{color:var(--muted);max-width:62ch}
+/* sections + build state */
+[data-build]{position:relative}
+section{padding-block:92px 0}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:28px}
+.sec-head .pr{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;color:var(--term)}
+.sec-head .rt{margin-left:auto;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.12em;color:var(--muted)}
+.intro{color:var(--soft);max-width:66ch;margin:-12px 0 24px}
+.sec-head,.card,.b{transition:opacity .45s ease,transform .45s ease,border-color .25s}
+.pend .sec-head,.pend .card,.pend .b{opacity:.05;transform:translateY(10px)}
+.pend .on{opacity:1;transform:none}
+.building{outline:1px dashed rgba(62,230,255,.4);outline-offset:14px}
+.building::after{content:"";position:absolute;left:-14px;right:-14px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:sweep 1.6s linear infinite}
+@keyframes sweep{to{top:100%}}
+
+/* agents layer */
+#agents{position:fixed;inset:0;z-index:70;pointer-events:none}
+.ag{position:absolute;left:0;top:0;opacity:0;transition:transform .34s cubic-bezier(.3,.8,.3,1),opacity .3s;display:flex;align-items:flex-start;gap:2px}
+.ag svg{width:16px;height:16px;flex:none}
+.ag span{font:700 .62rem var(--f-mono);padding:2px 6px;border-radius:2px;margin-top:12px;color:var(--bg);white-space:nowrap}
+.ag.c path{fill:var(--cyan)} .ag.c span{background:var(--cyan)}
+.ag.v path{fill:var(--violet)} .ag.v span{background:var(--violet)}
+.btag{position:fixed;z-index:69;font:700 .62rem var(--f-mono);padding:2px 6px;border-radius:2px;background:var(--violet);color:var(--bg);pointer-events:none;white-space:nowrap;animation:tag .9s ease forwards}
+.btag.c{background:var(--cyan)}
+@keyframes tag{0%{opacity:0;transform:translateY(4px)}15%,70%{opacity:1;transform:none}100%{opacity:0}}
+#hud{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:71;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 32px);background:rgba(13,20,38,.95);border:1px solid rgba(62,230,255,.45);border-radius:99px;padding:8px 8px 8px 16px;font-family:var(--f-mono);font-size:.72rem;color:var(--soft);box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#hud .dot{flex:none}
+#hud-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#hud-t b{color:var(--cyan);font-weight:500}
+#hud-p{color:var(--term);font-variant-numeric:tabular-nums}
+#hud button{font:500 .7rem var(--f-mono);color:var(--muted);background:var(--raised);border:1px solid var(--line);border-radius:99px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+#hud button:hover{color:var(--ink);border-color:var(--cyan)}
+#bot{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:68;display:flex;align-items:center;gap:8px;cursor:pointer;background:none;border:0;padding:0}
+#bot svg{width:54px;height:54px;filter:drop-shadow(0 0 12px rgba(62,230,255,.35));animation:float 3.2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-5px)}}
+#bub{font:500 .68rem var(--f-mono);color:var(--ink);background:var(--card);border:1px solid var(--cyan);border-radius:99px;padding:5px 11px;white-space:nowrap;max-width:60vw;overflow:hidden;text-overflow:ellipsis}
+.bot-b{fill:var(--card);stroke:var(--cyan);stroke-width:2}
+.bot-v{fill:var(--bg)}
+.bot-e{fill:var(--cyan);transform-origin:center;transform-box:fill-box;animation:eye 4s infinite}
+@keyframes eye{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.bot-a{fill:var(--violet)}
+.bot-l{stroke:var(--cyan);stroke-width:2}
+#rail{position:fixed;right:max(10px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:14px;padding:10px 6px}
+#rail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+#rail a{position:relative;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1.5px solid var(--muted);display:block}
+#rail a.act{background:var(--term);border-color:var(--term);box-shadow:0 0 10px var(--term)}
+
+/* about */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.about>*{min-width:0}
+.about p{color:var(--soft);margin-bottom:14px}
+.quote{padding:16px 18px;color:var(--head);font-weight:500}
+.princ{display:flex;flex-direction:column;gap:12px}
+.pr-i{display:grid;grid-template-columns:44px 1fr;gap:6px;padding:16px 18px}
+.pr-i .n{font-family:var(--f-mono);color:var(--cyan);font-size:.85rem}
+.pr-i p{color:var(--muted);font-size:.9rem;margin:2px 0 0}
+
+/* level log */
+.lvs{position:relative;display:flex;flex-direction:column;gap:14px;padding-left:92px}
+.lvs::before{content:"";position:absolute;left:66px;top:8px;bottom:8px;width:1px;background:linear-gradient(var(--cyan),var(--violet))}
+.lv{position:relative;padding:18px 20px}
+.lv::before{content:attr(data-y);position:absolute;left:-92px;top:18px;width:50px;text-align:right;font-family:var(--f-mono);font-size:.78rem;color:var(--soft)}
+.lv::after{content:"";position:absolute;left:-32px;top:20px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--cyan)}
+.lv .k{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;color:var(--term)}
+.lv h3{margin:6px 0}
+.lv p{color:var(--muted);font-size:.92rem}
+.lv.now{border-color:rgba(76,242,160,.45)}
+.lv.now::after{background:var(--term);border-color:var(--term);box-shadow:0 0 12px var(--term)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{font-family:var(--f-mono);font-size:.7rem;padding:4px 9px;border:1px solid var(--line);border-radius:3px;color:var(--soft);background:var(--bg2)}
+.chip.hi{color:var(--cyan);border-color:rgba(62,230,255,.3)}
+
+/* experience */
+.jobs{display:flex;flex-direction:column;gap:14px}
+.job{padding:22px}
+.job-top{display:flex;justify-content:space-between;gap:12px;font-family:var(--f-mono);font-size:.74rem}
+.job-top .when{color:var(--cyan)} .job-top .where{color:var(--muted)}
+.job h3{font-size:1.3rem;margin-top:8px}
+.co{color:var(--muted);font-size:.92rem;margin-top:4px}
+.short{color:var(--soft);margin-top:12px;max-width:78ch}
+.short b{color:var(--head)}
+details{margin-top:14px}
+summary{font:500 .76rem var(--f-mono);color:var(--cyan);cursor:pointer;list-style:none;display:inline-block;border:1px solid var(--line);border-radius:3px;padding:6px 10px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ "}
+details[open] summary::before{content:"− "}
+details ul{margin:12px 0 0;padding-left:18px;color:var(--soft)}
+details li{margin-bottom:6px}
+
+/* projects */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.proj{padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.proj:hover{border-color:rgba(62,230,255,.5)}
+.proj .k{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--violet)}
+.proj p{color:var(--muted);font-size:.93rem}
+.rep{margin-top:auto;border:1px solid var(--line);border-radius:4px;background:var(--bg2);font-family:var(--f-mono);font-size:.72rem}
+.rep-h{display:flex;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--line);color:var(--muted)}
+.rep-r{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;color:var(--muted)}
+.rep-r b{color:var(--head);font-weight:500;text-align:right}
+.layers{margin-top:14px;padding:22px}
+.layers .k{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;color:var(--muted)}
+.lay-btns{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.lay-btns button{font:500 .76rem var(--f-mono);padding:9px 12px;border-radius:4px;border:1px solid var(--line);background:var(--bg2);color:var(--soft);cursor:pointer}
+.lay-btns button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan);background:rgba(62,230,255,.08)}
+#lay-out{color:var(--soft);min-height:3.2em}
+#lay-out b{color:var(--head)}
 
 /* swarm */
-.swarm{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}
+.swarm{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
 .swarm>*{min-width:0}
-.stage{padding:16px;position:relative}
+.stage{padding:16px}
 .stage svg{width:100%;height:auto;display:block}
 .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
-.state{font-family:var(--f-mono);font-size:.76rem;color:var(--muted)}
+.state{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
 .state b{color:var(--amber);font-weight:500}
-.node circle.ring{fill:var(--bg2);stroke:var(--edge);stroke-width:1.5;transition:stroke .3s,fill .3s}
+.node circle.ring{fill:var(--bg2);stroke:var(--line);stroke-width:1.5;transition:stroke .3s}
 .node text{fill:var(--ink);font-family:var(--f-mono);font-size:11px;text-anchor:middle}
 .node text.sub{fill:var(--muted);font-size:9px}
 .node{cursor:pointer}
 .node:hover circle.ring,.node.busy circle.ring{stroke:var(--cyan)}
-.node.done circle.ring{stroke:var(--ok)}
+.node.done circle.ring{stroke:var(--term)}
 .node.flag circle.ring{stroke:var(--deny)}
-.link{stroke:var(--edge);stroke-width:1.2;stroke-dasharray:3 5}
+.link{stroke:var(--line);stroke-width:1.2;stroke-dasharray:3 5}
 .orb circle.ring{fill:url(#og);stroke:var(--violet);stroke-width:2}
-.side{display:flex;flex-direction:column;gap:14px;min-width:0}
-.log{padding:14px 16px;font-family:var(--f-mono);font-size:.75rem;line-height:1.75;height:300px;overflow:auto}
-.log .t{color:var(--muted)}
-.log .a{color:var(--violet)}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.log{padding:14px 16px;font-family:var(--f-mono);font-size:.74rem;line-height:1.75;height:300px;overflow:auto}
+.log .t{color:var(--muted)} .log .a{color:var(--violet)}
 .meters{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .meter{padding:12px;text-align:center}
-.meter b{display:block;font-family:var(--f-display);font-size:1.3rem;font-variant-numeric:tabular-nums}
-.meter span{font-size:.7rem;color:var(--muted);font-family:var(--f-mono)}
-.inspect{padding:14px 16px;font-size:.86rem;color:#c3cce4;min-height:84px}
+.meter b{display:block;font-size:1.4rem;color:var(--head);font-variant-numeric:tabular-nums}
+.meter span{font-size:.68rem;color:var(--muted);font-family:var(--f-mono)}
+.inspect{padding:14px 16px;font-size:.88rem;color:var(--soft);min-height:84px}
 .inspect b{font-family:var(--f-mono);color:var(--cyan);font-weight:500}
 
-/* timeline */
-.tl{position:relative;padding-left:28px}
-.tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--cyan),var(--violet),transparent)}
-.job{position:relative;padding:22px;margin-bottom:16px}
-.job::before{content:"";position:absolute;left:-27px;top:28px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--cyan);box-shadow:0 0 12px var(--cyan)}
-.job .when{font-family:var(--f-mono);font-size:.76rem;color:var(--cyan)}
-.job h3{font-size:1.2rem;margin-top:6px}
-.co{color:var(--muted);font-size:.9rem;margin-top:4px}
-.job ul{margin:14px 0 0;padding-left:18px;color:#c3cce4}
-.job li{margin-bottom:6px}
-
-/* projects */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.proj{padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0;transition:border-color .25s,transform .25s}
-.proj:hover{border-color:rgba(62,230,255,.5);transform:translateY(-2px)}
-.proj .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--violet)}
-.proj p{color:var(--muted);font-size:.93rem}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
-.chip{font-family:var(--f-mono);font-size:.7rem;padding:4px 9px;border:1px solid var(--edge);border-radius:99px;color:#c3cce4;background:rgba(62,230,255,.05)}
-
 /* skills */
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.filters button{font:500 .8rem var(--f-mono);padding:7px 14px;border-radius:99px;border:1px solid var(--edge);background:transparent;color:var(--muted);cursor:pointer}
-.filters button[aria-pressed="true"]{border-color:var(--cyan);color:var(--ink);background:rgba(62,230,255,.1)}
-.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.filters button{font:500 .76rem var(--f-mono);padding:8px 14px;border-radius:4px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--cyan);color:var(--bg);background:var(--cyan)}
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .sk{padding:18px;min-width:0}
-.sk .id{font-family:var(--f-mono);font-size:.68rem;color:var(--muted);display:flex;justify-content:space-between}
-.sk h3{margin:8px 0 10px}
+.sk .id{font-family:var(--f-mono);font-size:.66rem;color:var(--muted);display:flex;justify-content:space-between;letter-spacing:.08em;text-transform:uppercase}
+.sk h3{margin:8px 0 0}
 
-.certs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.edu{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-.edu .glass{padding:18px 20px;min-width:0}
-.edu span{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.edu p{color:#c3cce4;font-size:.92rem;margin-top:6px}
-.cert{padding:20px;display:flex;gap:14px;align-items:center;min-width:0}
-.badge{width:44px;height:44px;flex:none;border-radius:10px;display:grid;place-items:center;font-family:var(--f-display);font-size:.72rem;font-weight:700;background:linear-gradient(135deg,rgba(62,230,255,.25),rgba(155,123,255,.25));border:1px solid var(--edge)}
-.cert span{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.certs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cert{padding:18px;min-width:0}
+.badge{width:40px;height:40px;border-radius:4px;display:grid;place-items:center;font:700 .74rem var(--f-mono);color:var(--bg);background:var(--grad);margin-bottom:12px}
+.cert span,.edu span{font-family:var(--f-mono);font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.cert h3{margin-top:4px;font-size:.98rem}
+.edu{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.edu .card{padding:18px 20px;min-width:0}
+.edu h3{margin-top:6px}
+.edu p{color:var(--soft);font-size:.92rem;margin-top:6px}
 
-.contact{padding:40px 32px;display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;background:linear-gradient(135deg,rgba(62,230,255,.12),rgba(155,123,255,.12));}
+.contact{padding:44px 32px;display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;border-color:rgba(62,230,255,.35)}
 .contact>*{min-width:0}
+.contact h2{font-size:clamp(2rem,5vw,3.2rem);margin-top:10px}
 .contact .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.contact code{font-family:var(--f-mono);background:rgba(0,0,0,.35);border:1px solid var(--edge);padding:10px 14px;border-radius:8px;user-select:all;word-break:break-all}
-.contact small{display:block;margin-top:10px;font-size:.78rem;color:var(--muted)}
-footer{padding-block:48px;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.contact code{font-family:var(--f-mono);font-size:.85rem;background:var(--bg2);border:1px solid var(--line);padding:12px 14px;border-radius:4px;user-select:all;word-break:break-all}
+.contact small{display:block;margin-top:12px;font-family:var(--f-mono);font-size:.76rem}
+footer{padding-block:48px 110px;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center}
+footer button{font:inherit;color:var(--cyan);background:none;border:0;cursor:pointer;padding:0}
 
-@media (max-width:860px){
-  .hero,.swarm,.grid2,.contact{grid-template-columns:1fr}
+/* palette */
+#pal{position:fixed;inset:0;z-index:90;background:rgba(3,5,12,.7);display:flex;align-items:flex-start;justify-content:center;padding:14vh 16px 0}
+.pal-box{width:min(560px,100%);background:var(--card);border:1px solid var(--cyan);border-radius:8px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#pal-in{width:100%;font:500 .95rem var(--f-mono);color:var(--ink);background:var(--bg2);border:0;border-bottom:1px solid var(--line);padding:16px 18px;outline:0}
+#pal-list{max-height:46vh;overflow:auto;padding:6px}
+#pal-list button{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;font:500 .84rem var(--f-mono);color:var(--soft);background:none;border:0;border-radius:4px;padding:10px 12px;cursor:pointer}
+#pal-list button span{color:var(--muted);font-size:.72rem}
+#pal-list button.sel{background:var(--raised);color:var(--cyan)}
+.pal-f{font:500 .68rem var(--f-mono);color:var(--muted);padding:9px 14px;border-top:1px solid var(--line)}
+
+@media (max-width:900px){
+  .hero,.swarm,.grid2,.contact,.about{grid-template-columns:1fr}
+  .hero{padding-block:40px 32px;gap:28px}
   .stats{grid-template-columns:1fr 1fr}
   .skills{grid-template-columns:1fr}
   .certs{grid-template-columns:1fr 1fr}
   .edu{grid-template-columns:1fr}
-  .links{display:none}
+  .links,#rail,.navcta{display:none}
+  .links + .kbtn{margin-left:auto}
   .meters{grid-template-columns:1fr 1fr}
-  .hero{padding-block:44px 32px}
+  .lvs{padding-left:26px}
+  .lvs::before{left:6px}
+  .lv::before{position:static;display:block;width:auto;text-align:left;margin-bottom:6px;color:var(--cyan)}
+  .lv::after{left:-25px}
+  section{padding-block:68px 0}
+  #bub{display:none}
+  #globe{width:110%;height:120%}
+  #bot svg{width:44px;height:44px}
+  .sec-head .rt{display:none}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 
 <canvas id="field" aria-hidden="true"></canvas>
-<div class="glow" aria-hidden="true"></div><div class="glow b" aria-hidden="true"></div>
+<div id="agents" aria-hidden="true"></div>
 
 <nav>
   <div class="wrap">
-    <span class="logo">KB<span>/</span>OPS</span>
-    <div class="links"><a href="#swarm">Agent swarm</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></div>
-    <span class="status"><i class="dot"></i>OPEN TO ROLES</span>
+    <a class="logo" href="#top">KB<b>.</b></a>
+    <div class="links"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#swarm">Demo</a><a href="#skills">Skills</a><a href="#contact">Contact</a></div>
+    <button class="kbtn" id="kbtn" aria-label="Open command palette">⌘K</button>
+    <a class="navcta" href="#contact">Contact →</a>
   </div>
 </nav>
 
-<main class="wrap">
-  <header class="hero">
+<div id="rail" aria-hidden="true"></div>
+
+<main class="wrap" id="top">
+  <header class="hero" data-build id="hero">
     <div>
-      <p class="tag">// Team Lead · IT Infrastructure · PB Pay</p>
-      <h1>Karthik <span class="grad">Babu</span></h1>
-      <p class="typed" aria-live="off"><span id="typed"></span><span class="caret"></span></p>
-      <p class="lede">8+ years in IT infrastructure, from desktop support and SonicWall firewalls to running the network, cloud and endpoint stack for a regulated payments company. Firewalls, Azure, identity and every managed device, built from the ground up and kept audit-ready.</p>
-      <div class="cta">
-        <a class="btn" href="#swarm">Deploy the agent swarm →</a>
-        <a class="btn ghost" href="#contact">Get in touch</a>
+      <p class="prompt b"><span>karthik@netops:~$</span> // IT INFRASTRUCTURE · CLOUD SECURITY · AI-ASSISTED OPS</p>
+      <h1 class="b"><span class="grad">Karthik<br>Babu</span><i>.</i></h1>
+      <p class="sub b">Team Lead · 8+ yrs · Azure · FortiGate · Intune · AI-assisted ops</p>
+      <div class="pills b">
+        <span class="pill"><b>●</b> Open to network · cloud · security roles</span>
+        <span class="pill">⌖ Gurugram, India</span>
+        <span class="pill">✓ AZ-104 · CCNA · AD360</span>
+      </div>
+      <p class="lede b">I build and run the network, cloud and endpoint stack that keeps a regulated payments company secure and audit-ready, from the firewall at the edge to the last managed laptop.</p>
+      <p class="typed b" aria-live="off"><span id="typed"></span><span class="caret"></span></p>
+      <div class="cta b">
+        <a class="btn" href="#swarm">⚡ Deploy the agent swarm</a>
+        <a class="btn ghost" href="#experience">View experience</a>
+        <a class="btn ghost" href="#contact">Contact</a>
       </div>
     </div>
-    <div class="glass card-id">
-      <div class="card-head"><span>operator.profile</span><span class="ok">● online</span></div>
-      <div class="row"><span>role</span><span>Team Lead, IT Infrastructure</span></div>
-      <div class="row"><span>domain</span><span>network · cloud · endpoint</span></div>
-      <div class="row"><span>stack</span><span>Azure · Entra · Intune · FortiGate</span></div>
-      <div class="row"><span>certs</span><span>AZ-104 · CCNA · AD360</span></div>
-      <div class="row"><span>change_control</span><span class="ok">enforced</span></div>
-      <div class="row"><span>experience</span><span>8+ yrs · since Dec 2017</span></div>
-      <div class="row"><span>location</span><span>Gurugram, India</span></div>
+    <div class="hero-r b">
+      <canvas id="globe" aria-hidden="true"></canvas>
+      <div class="card card-id">
+        <div class="card-head"><span>operator.profile</span><span class="badge-live"><i class="dot"></i>STACK_STATUS: SECURE</span></div>
+        <div class="row"><span>role</span><span>Team Lead, IT Infrastructure</span></div>
+        <div class="row"><span>org</span><span>PB Pay</span></div>
+        <div class="row"><span>domain</span><span>network · cloud · endpoint</span></div>
+        <div class="row"><span>stack</span><span>Azure · Entra · Intune · FortiGate</span></div>
+        <div class="row"><span>certs</span><span>AZ-104 · CCNA · AD360</span></div>
+        <div class="row"><span>change_control</span><span class="ok">enforced</span></div>
+        <div class="row"><span>experience</span><span>8+ yrs · since Dec 2017</span></div>
+      </div>
     </div>
   </header>
 
-  <div class="stats">
-    <div class="glass stat"><b data-count="8" data-suffix="+">0</b><span>Years in IT infrastructure</span></div>
-    <div class="glass stat"><b data-count="3">0</b><span>Companies, 4 roles</span></div>
-    <div class="glass stat"><b data-count="3">0</b><span>OS platforms: Windows, macOS, Linux</span></div>
-    <div class="glass stat"><b data-count="2">0</b><span>Firewall platforms: SonicWall, FortiGate</span></div>
+  <div class="stats" data-build id="stats">
+    <div class="card stat"><b data-count="8" data-suffix="+">0</b><span>Years in IT infrastructure</span></div>
+    <div class="card stat"><b data-count="4" data-suffix="">0</b><span>Roles across 3 companies</span></div>
+    <div class="card stat"><b data-count="3" data-suffix="">0</b><span>OS platforms: Windows · macOS · Linux</span></div>
+    <div class="card stat"><b data-count="2" data-suffix="">0</b><span>Firewall platforms: SonicWall · FortiGate</span></div>
   </div>
 
-  <!-- SWARM -->
-  <section id="swarm">
-    <div class="sec-head">
-      <p class="tag">// 01 · live demo</p>
-      <h2>NetOps <span class="grad">agent swarm</span></h2>
-      <p>One orchestrator splits a daily ops run into tasks, specialist agents work them in parallel, and the results fan back in as a single report. Press Deploy, then hover an agent to see its job.</p>
-    </div>
-    <div class="swarm">
-      <div class="glass stage">
-        <div class="controls">
-          <button class="btn" id="deploy">▶ Deploy swarm</button>
-          <span class="state">status: <b id="st">idle · awaiting task</b></span>
-        </div>
-        <svg viewBox="0 0 520 440" id="svg" role="img" aria-label="Orchestrator connected to six specialist agents">
-          <defs>
-            <radialGradient id="og"><stop offset="0" stop-color="#9b7bff" stop-opacity=".55"/><stop offset="1" stop-color="#0b1022"/></radialGradient>
-          </defs>
-          <g id="links"></g>
-          <g id="pulses"></g>
-          <g id="nodes"></g>
-        </svg>
+  <section id="about" data-build data-label="About" data-say="id-agent wrote this bit">
+    <div class="sec-head"><span class="pr">&gt; 01 / ABOUT</span><h2>About</h2><span class="rt">GURUGRAM, IN</span></div>
+    <div class="about">
+      <div class="b">
+        <p>I'm an IT infrastructure lead with 8+ years of hands-on work, starting at the help desk and growing into owning firewalls, cloud networking, identity and the full device fleet.</p>
+        <p>Today I lead IT infrastructure at PB Pay, a payment aggregator. I run FortiGate and Azure networking, harden Microsoft 365 and Entra ID, manage endpoints in Intune and keep every production change ticketed and approved.</p>
+        <p>Lately I've been using Claude and Claude Code to take repetitive ops work off the team: block-list hygiene, scripts, reports and a custom network monitor.</p>
+        <div class="card quote">"Security isn't a product you buy. It's how you run every change."</div>
       </div>
-      <div class="side">
-        <div class="meters">
-          <div class="glass meter"><b id="m-a">0</b><span>agents</span></div>
-          <div class="glass meter"><b id="m-c">0</b><span>checks</span></div>
-          <div class="glass meter"><b id="m-f">0</b><span>flagged</span></div>
-          <div class="glass meter"><b id="m-t">0.0s</b><span>elapsed</span></div>
-        </div>
-        <div class="glass inspect" id="inspect"><b>hover an agent</b><br>Each node is a specialist that owns one part of the stack.</div>
-        <div class="glass log" id="log"><span class="t">$ waiting for deploy…</span></div>
+      <div class="princ">
+        <div class="card pr-i"><span class="n">01</span><div><h3>Secure by default</h3><p>Least privilege, Conditional Access and compliant devices before convenience.</p></div></div>
+        <div class="card pr-i"><span class="n">02</span><div><h3>Every change ticketed</h3><p>Formal approval and an audit trail for anything that touches production.</p></div></div>
+        <div class="card pr-i"><span class="n">03</span><div><h3>Automate the repeatable</h3><p>If it's done twice, it becomes a script, a policy or an agent task.</p></div></div>
+        <div class="card pr-i"><span class="n">04</span><div><h3>Monitor everything</h3><p>Links, certificates, sign-ins and endpoints, watched before users notice.</p></div></div>
       </div>
     </div>
-    <p class="note">// visualisation of an ops workflow design. agents, IPs and results are simulated.</p>
   </section>
 
-  <!-- EXPERIENCE -->
-  <section id="experience">
-    <div class="sec-head"><p class="tag">// 02 · experience</p><h2>Run history</h2></div>
-    <div class="tl">
-      <article class="glass job">
-        <p class="when">APR 2026 → PRESENT</p>
+  <section id="growth" data-build data-label="Growth" data-say="nms-agent plotted the timeline">
+    <div class="sec-head"><span class="pr">&gt; 02 / GROWTH</span><h2>Level-up log</h2><span class="rt">HELP DESK → AI-ASSISTED OPS</span></div>
+    <div class="lvs">
+      <div class="card lv" data-y="2017"><span class="k">LV.1 · FOUNDATIONS</span><h3>Support &amp; hardware</h3><p>Started in IT support: ERP user training, system monitoring, servers, PCs, routers and switches.</p><div class="chips"><span class="chip">Hardware</span><span class="chip">ERP</span><span class="chip">Troubleshooting</span></div></div>
+      <div class="card lv" data-y="2020"><span class="k">LV.2 · NETWORK OWNER</span><h3>Ran a whole site's IT</h3><p>Owned SonicWall firewalls, VPN for remote users, centrally managed Wi-Fi, backups and endpoint security.</p><div class="chips"><span class="chip">SonicWall</span><span class="chip">VPN</span><span class="chip">Omada Wi-Fi</span><span class="chip">Backups</span></div></div>
+      <div class="card lv" data-y="2024"><span class="k">LV.3 · ENTERPRISE SCALE</span><h3>Infra at Policybazaar</h3><p>Active Directory, Google Workspace and multi-state branch support. Won the Rising Star Award.</p><div class="chips"><span class="chip">Active Directory</span><span class="chip">Google Workspace</span><span class="chip">Server support</span></div></div>
+      <div class="card lv" data-y="2026"><span class="k">LV.4 · CLOUD &amp; SECURITY LEAD</span><h3>Team Lead at PB Pay</h3><p>Azure hub-and-spoke, FortiGate SD-WAN, Entra ID hardening, Intune fleet and SOC triage in a regulated environment.</p><div class="chips"><span class="chip">Azure</span><span class="chip">FortiGate</span><span class="chip">Entra ID</span><span class="chip">Intune</span><span class="chip">Sentinel</span></div></div>
+      <div class="card lv now" data-y="NOW"><span class="k">LV.5 · AI-ASSISTED OPS ● LIVE</span><h3>Ops with agents</h3><p>Using Claude and Claude Code for ops automation, and building a custom network monitor that blends Nagios checks with Zabbix dashboards.</p><div class="chips"><span class="chip hi">Claude</span><span class="chip hi">Claude Code</span><span class="chip hi">Python</span><span class="chip hi">Agents</span></div></div>
+    </div>
+  </section>
+
+  <section id="experience" data-build data-label="Experience" data-say="ep-agent filed the run history">
+    <div class="sec-head"><span class="pr">&gt; 03 / EXPERIENCE</span><h2>Experience</h2><span class="rt">DEC 2017 → PRESENT</span></div>
+    <div class="jobs">
+      <article class="card job">
+        <div class="job-top"><span class="when">APR 2026 — PRESENT</span><span class="where">Gurugram, IN</span></div>
         <h3>Team Lead, IT Infrastructure</h3>
-        <p class="co">PB Pay · Gurugram · Payment aggregator</p>
-        <ul>
-          <li>Built and run the full IT and network stack: FortiGate firewalls, SD-WAN, Extreme Networks switching and Azure hub-and-spoke networking.</li>
+        <p class="co">PB Pay · Payment aggregator</p>
+        <p class="short"><b>In short:</b> I own the full IT and network stack for a regulated payments company: firewalls, cloud networking, identity, endpoints and monitoring, with every change under formal control.</p>
+        <div class="chips"><span class="chip hi">Full-stack ownership</span><span class="chip hi">Audit-ready change control</span><span class="chip hi">Cloud + on-prem</span></div>
+        <details><summary>Show details</summary><ul>
+          <li>Built and run FortiGate firewalls, SD-WAN, Extreme Networks switching and Azure hub-and-spoke networking.</li>
           <li>Hardened Microsoft 365 and Azure with Conditional Access, DLP, MDM/MAM and trusted-location access controls.</li>
           <li>Manage a Windows, macOS and Linux fleet in Intune, with PowerShell deployments and compliance policies.</li>
           <li>Triage alerts in Microsoft Sentinel and investigate sign-in anomalies.</li>
           <li>Run change management with full audit trails and formal approval for every production change.</li>
-        </ul>
+        </ul></details>
       </article>
-      <article class="glass job">
-        <p class="when">FEB 2024 → MAR 2026</p>
+      <article class="card job">
+        <div class="job-top"><span class="when">FEB 2024 — MAR 2026</span><span class="where">Gurugram, IN</span></div>
         <h3>Senior Executive, IT Infra</h3>
-        <p class="co">Policybazaar.com · Gurugram</p>
-        <ul>
-          <li><b>Rising Star Award (H2)</b> for server support.</li>
+        <p class="co">Policybazaar.com</p>
+        <p class="short"><b>In short:</b> Server and infrastructure support at enterprise scale, recognised with the Rising Star Award.</p>
+        <div class="chips"><span class="chip hi">Rising Star Award · H2</span><span class="chip hi">Multi-state branch support</span></div>
+        <details><summary>Show details</summary><ul>
           <li>Managed user lifecycle and access control in Windows Server Active Directory.</li>
           <li>Administered Google Workspace mail for the organisation.</li>
           <li>Configured and supported Windows, Mac and Chromebook devices.</li>
           <li>Resolved hardware, software and network tickets, including remote troubleshooting for branch offices in other states.</li>
           <li>Maintained the IT asset inventory and planned equipment upgrades.</li>
-        </ul>
+        </ul></details>
       </article>
-      <article class="glass job">
-        <p class="when">JUL 2020 → MAR 2024</p>
+      <article class="card job">
+        <div class="job-top"><span class="when">JUL 2020 — MAR 2024</span><span class="where">Faridabad, IN</span></div>
         <h3>IT Incharge</h3>
-        <p class="co">Gudi Exports Pvt. Ltd. · Faridabad</p>
-        <ul>
+        <p class="co">Gudi Exports Pvt. Ltd.</p>
+        <p class="short"><b>In short:</b> Sole owner of the company's IT: firewall, servers, Wi-Fi, backups, endpoint security and vendors.</p>
+        <div class="chips"><span class="chip hi">SonicWall NSA + TZ400</span><span class="chip hi">VPN for remote work</span><span class="chip hi">Secure printing rollout</span></div>
+        <details><summary>Show details</summary><ul>
           <li>Ran security, load balancing, routing and web access policy on Dell SonicWall NSA and TZ400 firewalls.</li>
           <li>Maintained and upgraded firewall, server and client systems across Windows, Ubuntu, MacBook and Mac mini.</li>
           <li>Set up VPN access for work-from-home users and centrally managed Wi-Fi with a TP-Link Omada controller.</li>
           <li>Ran multi-location user backups to prevent data loss, and endpoint security on Seqrite.</li>
           <li>Introduced secure printing for all users to cut paper waste.</li>
           <li>Handled equipment sourcing, vendor management and CCTV installation and records.</li>
-        </ul>
+        </ul></details>
       </article>
-      <article class="glass job">
-        <p class="when">DEC 2017 → MAR 2020</p>
+      <article class="card job">
+        <div class="job-top"><span class="when">DEC 2017 — MAR 2020</span><span class="where">Faridabad, IN</span></div>
         <h3>IT Support Technician</h3>
-        <p class="co">Gudi Exports Pvt. Ltd. · Faridabad</p>
-        <ul>
+        <p class="co">Gudi Exports Pvt. Ltd.</p>
+        <p class="short"><b>In short:</b> First IT role: user training, system monitoring and hands-on hardware and network support.</p>
+        <details><summary>Show details</summary><ul>
           <li>Designed and ran ERP training sessions for end users.</li>
           <li>Monitored systems in production and fixed errors quickly.</li>
           <li>Supported IT rollouts and maintained servers, PCs, routers and switches.</li>
-        </ul>
+        </ul></details>
       </article>
     </div>
   </section>
 
-  <!-- PROJECTS -->
-  <section id="projects">
-    <div class="sec-head"><p class="tag">// 03 · projects</p><h2>Shipped systems</h2></div>
+  <section id="projects" data-build data-label="Projects" data-say="fw-agent wired these up">
+    <div class="sec-head"><span class="pr">&gt; 04 / PROJECTS</span><h2>Flagship work</h2><span class="rt">SECURITY · NETWORK · ENDPOINT</span></div>
     <div class="grid2">
-      <article class="glass proj"><span class="k">security · identity</span><h3>Zero-trust Microsoft 365</h3><p>Conditional Access baselines, DLP and app protection so company data stays on compliant devices and trusted networks.</p><div class="chips"><span class="chip">Entra ID</span><span class="chip">Conditional Access</span><span class="chip">Purview DLP</span></div></article>
-      <article class="glass proj"><span class="k">network</span><h3>SD-WAN + Azure hub-and-spoke</h3><p>Office edge on FortiGate SD-WAN, linked to an Azure hub with Azure Firewall, a DR path and segmented spokes.</p><div class="chips"><span class="chip">FortiGate</span><span class="chip">Azure Firewall</span><span class="chip">VNet peering</span></div></article>
-      <article class="glass proj"><span class="k">endpoint</span><h3>Intune fleet automation</h3><p>Zero-touch enrolment, compliance policies and PowerShell packages for a mixed Windows, macOS and Linux fleet.</p><div class="chips"><span class="chip">Intune</span><span class="chip">PowerShell</span><span class="chip">Autopilot</span></div></article>
-      <article class="glass proj"><span class="k">tooling · in progress</span><h3>Custom network monitor</h3><p>A monitor that blends Nagios-style checks with Zabbix-style dashboards, tuned to our own devices.</p><div class="chips"><span class="chip">Python</span><span class="chip">SNMP</span><span class="chip">Zabbix</span></div></article>
+      <article class="card proj"><span class="k">security · identity</span><h3>Zero-trust Microsoft 365</h3><p>Conditional Access baselines, DLP and app protection so company data stays on compliant devices and trusted networks.</p><div class="chips"><span class="chip">Entra ID</span><span class="chip">Conditional Access</span><span class="chip">Purview DLP</span></div>
+        <div class="rep"><div class="rep-h"><span>▤ status report</span><span class="ok">LIVE</span></div><div class="rep-r"><span>Access policy</span><b>Conditional Access</b></div><div class="rep-r"><span>Data protection</span><b>DLP + MAM</b></div><div class="rep-r"><span>Device trust</span><b>compliant only</b></div></div></article>
+      <article class="card proj"><span class="k">network</span><h3>SD-WAN + Azure hub-and-spoke</h3><p>Office edge on FortiGate SD-WAN, linked to an Azure hub with Azure Firewall, a DR path and segmented spokes.</p><div class="chips"><span class="chip">FortiGate</span><span class="chip">Azure Firewall</span><span class="chip">VNet peering</span></div>
+        <div class="rep"><div class="rep-h"><span>▤ status report</span><span class="ok">LIVE</span></div><div class="rep-r"><span>Edge</span><b>FortiGate SD-WAN</b></div><div class="rep-r"><span>Cloud edge</span><b>Azure Firewall</b></div><div class="rep-r"><span>Resilience</span><b>DR path</b></div></div></article>
+      <article class="card proj"><span class="k">endpoint</span><h3>Intune fleet automation</h3><p>Zero-touch enrolment, compliance policies and PowerShell packages for a mixed Windows, macOS and Linux fleet.</p><div class="chips"><span class="chip">Intune</span><span class="chip">PowerShell</span><span class="chip">Autopilot</span></div>
+        <div class="rep"><div class="rep-h"><span>▤ status report</span><span class="ok">LIVE</span></div><div class="rep-r"><span>Platforms</span><b>3</b></div><div class="rep-r"><span>Enrolment</span><b>zero-touch</b></div><div class="rep-r"><span>Deployments</span><b>PowerShell</b></div></div></article>
+      <article class="card proj"><span class="k">tooling · ai-assisted</span><h3>Custom network monitor</h3><p>A monitor that blends Nagios-style checks with Zabbix-style dashboards, tuned to our own devices and built with Claude Code.</p><div class="chips"><span class="chip">Python</span><span class="chip">SNMP</span><span class="chip">Claude Code</span></div>
+        <div class="rep"><div class="rep-h"><span>▤ status report</span><span class="warn">BUILDING</span></div><div class="rep-r"><span>Checks</span><b>Nagios-style</b></div><div class="rep-r"><span>Dashboards</span><b>Zabbix-style</b></div><div class="rep-r"><span>Stage</span><b>in progress</b></div></div></article>
+    </div>
+    <div class="card layers">
+      <span class="k">DEFENCE IN DEPTH · CLICK A LAYER TO INSPECT ↓</span>
+      <div class="lay-btns" role="group" aria-label="Security layers">
+        <button aria-pressed="true" data-l="0">L1 · Edge</button><button aria-pressed="false" data-l="1">L2 · Cloud edge</button><button aria-pressed="false" data-l="2">L3 · Identity</button><button aria-pressed="false" data-l="3">L4 · Endpoint</button><button aria-pressed="false" data-l="4">L5 · Monitoring</button>
+      </div>
+      <p id="lay-out"></p>
     </div>
   </section>
 
-  <!-- SKILLS -->
-  <section id="skills">
-    <div class="sec-head"><p class="tag">// 04 · skills</p><h2>Capability matrix</h2></div>
-    <div class="filters" role="group" aria-label="Filter skills">
-      <button aria-pressed="true" data-f="all">all</button><button aria-pressed="false" data-f="net">network</button><button aria-pressed="false" data-f="cloud">cloud</button><button aria-pressed="false" data-f="sec">security</button><button aria-pressed="false" data-f="auto">automation</button>
+  <section id="swarm" data-build data-label="Agent swarm" data-say="my agent cousins live here">
+    <div class="sec-head"><span class="pr">&gt; 05 / LIVE DEMO</span><h2>NetOps <span class="grad">agent swarm</span></h2><span class="rt">FAN-OUT → FAN-IN</span></div>
+    <p class="intro b">How I think about AI-assisted ops. One orchestrator splits a daily ops run into tasks, specialist agents work them in parallel, and the results fan back in as one report. Press <b>Deploy swarm</b>, then hover an agent.</p>
+    <div class="swarm">
+      <div class="card stage">
+        <div class="controls">
+          <button class="btn" id="deploy">▶ Deploy swarm</button>
+          <span class="state">status: <b id="st">idle · awaiting task</b></span>
+        </div>
+        <svg viewBox="0 0 520 440" id="svg" role="img" aria-label="Orchestrator connected to six specialist agents">
+          <defs><radialGradient id="og"><stop offset="0" stop-color="#9b7bff" stop-opacity=".55"/><stop offset="1" stop-color="#0a1020"/></radialGradient></defs>
+          <g id="links"></g><g id="pulses"></g><g id="nodes"></g>
+        </svg>
+      </div>
+      <div class="side">
+        <div class="meters">
+          <div class="card meter"><b id="m-a">0</b><span>agents</span></div>
+          <div class="card meter"><b id="m-c">0</b><span>checks</span></div>
+          <div class="card meter"><b id="m-f">0</b><span>flagged</span></div>
+          <div class="card meter"><b id="m-t">0.0s</b><span>elapsed</span></div>
+        </div>
+        <div class="card inspect" id="inspect"><b>hover an agent</b><br>Each node is a specialist that owns one part of the stack.</div>
+        <div class="card log" id="log"><span class="t">$ waiting for deploy…</span></div>
+      </div>
+    </div>
+    <p class="note b">// visualisation of an ops workflow design. agents, IPs and results in this demo are simulated.</p>
+  </section>
+
+  <section id="skills" data-build data-label="Skills" data-say="soc-agent indexed the skills">
+    <div class="sec-head"><span class="pr">&gt; 06 / SKILLS</span><h2>Skills matrix</h2><span class="rt">9 SYSTEMS</span></div>
+    <div class="filters b" role="group" aria-label="Filter skills">
+      <button aria-pressed="true" data-f="all">All</button><button aria-pressed="false" data-f="net">Network</button><button aria-pressed="false" data-f="cloud">Cloud</button><button aria-pressed="false" data-f="sec">Security</button><button aria-pressed="false" data-f="auto">Automation</button>
     </div>
     <div class="skills" id="skillgrid">
-      <div class="glass sk" data-c="net"><div class="id"><span>#SYS-01</span><span>network</span></div><h3>Firewall &amp; SD-WAN</h3><div class="chips"><span class="chip">FortiGate</span><span class="chip">SonicWall</span><span class="chip">SD-WAN</span><span class="chip">VPN</span></div></div>
-      <div class="glass sk" data-c="net"><div class="id"><span>#SYS-02</span><span>network</span></div><h3>Switching &amp; wireless</h3><div class="chips"><span class="chip">Extreme Networks</span><span class="chip">Cisco</span><span class="chip">VLANs</span><span class="chip">Omada Wi-Fi</span></div></div>
-      <div class="glass sk" data-c="cloud"><div class="id"><span>#SYS-03</span><span>cloud</span></div><h3>Azure</h3><div class="chips"><span class="chip">Hub-and-spoke</span><span class="chip">Azure Firewall</span><span class="chip">NSGs</span></div></div>
-      <div class="glass sk" data-c="cloud"><div class="id"><span>#SYS-04</span><span>cloud</span></div><h3>Identity &amp; productivity</h3><div class="chips"><span class="chip">Entra ID</span><span class="chip">Active Directory</span><span class="chip">AD360</span><span class="chip">M365</span><span class="chip">Google Workspace</span></div></div>
-      <div class="glass sk" data-c="sec"><div class="id"><span>#SYS-05</span><span>security</span></div><h3>Endpoint &amp; hardware</h3><div class="chips"><span class="chip">Intune</span><span class="chip">Defender</span><span class="chip">Seqrite</span><span class="chip">Mac &amp; Chromebook</span></div></div>
-      <div class="glass sk" data-c="sec"><div class="id"><span>#SYS-06</span><span>security</span></div><h3>Monitoring &amp; SOC</h3><div class="chips"><span class="chip">Sentinel</span><span class="chip">Trend Micro</span><span class="chip">Zabbix</span></div></div>
-      <div class="glass sk" data-c="auto"><div class="id"><span>#SYS-07</span><span>automation</span></div><h3>Scripting</h3><div class="chips"><span class="chip">Python</span><span class="chip">PowerShell</span><span class="chip">Excel</span></div></div>
-      <div class="glass sk" data-c="auto"><div class="id"><span>#SYS-08</span><span>automation</span></div><h3>AI-assisted ops</h3><div class="chips"><span class="chip">Claude</span><span class="chip">Claude Code</span><span class="chip">Agents</span></div></div>
-      <div class="glass sk" data-c="sec"><div class="id"><span>#SYS-09</span><span>security</span></div><h3>Operations</h3><div class="chips"><span class="chip">Change control</span><span class="chip">Backup &amp; recovery</span><span class="chip">Asset inventory</span><span class="chip">Vendor mgmt</span></div></div>
+      <div class="card sk" data-c="net"><div class="id"><span>#SYS-01</span><span>network</span></div><h3>Firewall &amp; SD-WAN</h3><div class="chips"><span class="chip">FortiGate</span><span class="chip">SonicWall</span><span class="chip">SD-WAN</span><span class="chip">VPN</span></div></div>
+      <div class="card sk" data-c="net"><div class="id"><span>#SYS-02</span><span>network</span></div><h3>Switching &amp; wireless</h3><div class="chips"><span class="chip">Extreme Networks</span><span class="chip">Cisco</span><span class="chip">VLANs</span><span class="chip">Omada Wi-Fi</span></div></div>
+      <div class="card sk" data-c="cloud"><div class="id"><span>#SYS-03</span><span>cloud</span></div><h3>Azure</h3><div class="chips"><span class="chip">Hub-and-spoke</span><span class="chip">Azure Firewall</span><span class="chip">NSGs</span></div></div>
+      <div class="card sk" data-c="cloud"><div class="id"><span>#SYS-04</span><span>cloud</span></div><h3>Identity &amp; productivity</h3><div class="chips"><span class="chip">Entra ID</span><span class="chip">Active Directory</span><span class="chip">AD360</span><span class="chip">M365</span><span class="chip">Google Workspace</span></div></div>
+      <div class="card sk" data-c="sec"><div class="id"><span>#SYS-05</span><span>security</span></div><h3>Endpoint &amp; hardware</h3><div class="chips"><span class="chip">Intune</span><span class="chip">Defender</span><span class="chip">Seqrite</span><span class="chip">Mac &amp; Chromebook</span></div></div>
+      <div class="card sk" data-c="sec"><div class="id"><span>#SYS-06</span><span>security</span></div><h3>Monitoring &amp; SOC</h3><div class="chips"><span class="chip">Sentinel</span><span class="chip">Trend Micro</span><span class="chip">Zabbix</span><span class="chip">Nagios</span></div></div>
+      <div class="card sk" data-c="auto"><div class="id"><span>#SYS-07</span><span>automation</span></div><h3>Scripting</h3><div class="chips"><span class="chip">Python</span><span class="chip">PowerShell</span><span class="chip">Excel</span></div></div>
+      <div class="card sk" data-c="auto"><div class="id"><span>#SYS-08</span><span>ai / genai</span></div><h3>AI-assisted ops</h3><div class="chips"><span class="chip hi">Claude</span><span class="chip hi">Claude Code</span><span class="chip hi">Agents</span></div></div>
+      <div class="card sk" data-c="sec"><div class="id"><span>#SYS-09</span><span>ops craft</span></div><h3>Operations</h3><div class="chips"><span class="chip">Change control</span><span class="chip">Backup &amp; recovery</span><span class="chip">Asset inventory</span><span class="chip">Vendor mgmt</span></div></div>
     </div>
   </section>
 
-  <section id="certs">
-    <div class="sec-head"><p class="tag">// 05 · certifications</p><h2>Verified credentials</h2></div>
+  <section id="certs" data-build data-label="Certifications" data-say="cert-agent verified these">
+    <div class="sec-head"><span class="pr">&gt; 07 / CERTIFIED</span><h2>Credentials</h2><span class="rt">VERIFIED</span></div>
     <div class="certs">
-      <div class="glass cert"><div class="badge">AZ</div><div><span>Microsoft · valid to May 2027</span><h3>Azure Administrator Associate (AZ-104)</h3></div></div>
-      <div class="glass cert"><div class="badge">CC</div><div><span>Network Bulls · Mar 2026</span><h3>CCNA 200-301</h3></div></div>
-      <div class="glass cert"><div class="badge">ME</div><div><span>ManageEngine · Mar 2026</span><h3>MECPA AD360</h3></div></div>
-      <div class="glass cert"><div class="badge">JK</div><div><span>Jetking · 2016</span><h3>Hardware &amp; Network Engineer + Cloud</h3></div></div>
+      <div class="card cert"><div class="badge">AZ</div><span>Microsoft · valid to May 2027</span><h3>Azure Administrator Associate (AZ-104)</h3></div>
+      <div class="card cert"><div class="badge">CC</div><span>Network Bulls · Mar 2026</span><h3>CCNA 200-301</h3></div>
+      <div class="card cert"><div class="badge">ME</div><span>ManageEngine · Mar 2026</span><h3>MECPA AD360</h3></div>
+      <div class="card cert"><div class="badge">JK</div><span>Jetking · 2016</span><h3>Hardware &amp; Network Engineer + Cloud</h3></div>
     </div>
     <div class="edu">
-      <div class="glass"><span>Education</span><h3 style="margin-top:6px">BA, Economics</h3><p>School of Open Learning, University of Delhi · 2016–2021</p></div>
-      <div class="glass"><span>Award · Jan 2017</span><h3 style="margin-top:6px">3rd prize, Jetking Cyber Carnival</h3><p>Built a self-powered generator from scrap SMPS units.</p></div>
+      <div class="card"><span>// Education</span><h3>BA, Economics</h3><p>School of Open Learning, University of Delhi · 2016–2021</p></div>
+      <div class="card"><span>// Awards</span><h3>Rising Star Award · Policybazaar</h3><p>Also 3rd prize at Jetking Cyber Carnival 2017 for a self-powered generator built from scrap SMPS units.</p></div>
     </div>
   </section>
 
-  <section id="contact">
-    <div class="glass contact">
-      <div><p class="tag">// 06 · contact</p><h2 style="margin-top:10px">Open a <span class="grad">connection</span>.</h2><p style="margin-top:12px;color:#c3cce4">Open to network, cloud and security roles.</p></div>
+  <section id="contact" data-build data-label="Contact" data-say="say hi, I'll route it">
+    <div class="card contact">
+      <div><span class="prompt">&gt; 08 / CONTACT</span><h2>Let's keep it <span class="grad">secure</span>.</h2><p style="margin-top:12px;color:var(--soft)">Open to network, cloud and security roles.</p></div>
       <div>
         <div class="row"><code id="mail">karthikbabu10126@gmail.com</code><button class="btn" id="copy">Copy</button></div>
         <small><a href="https://www.linkedin.com/in/karthik-babu-189a89149/" target="_blank" rel="noopener">LinkedIn ↗</a></small>
@@ -358,28 +523,56 @@ footer{padding-block:48px;font-family:var(--f-mono);font-size:.72rem;color:var(-
     </div>
   </section>
 
-  <footer><span>© Karthik Babu</span><span>built with Claude · agent demo is simulated</span></footer>
+  <footer><span>© Karthik Babu · assembled by 6 ops agents · built with Claude</span><button id="replay">↻ rebuild site</button></footer>
 </main>
+
+<div id="hud" role="status"><i class="dot"></i><span id="hud-t">swarm · 6 agents · standing by</span><span id="hud-p">0%</span><button id="hud-b">skip »</button></div>
+<button id="bot" aria-label="Open command palette">
+  <span id="bub">hi, I'm NOC-bot</span>
+  <svg viewBox="0 0 64 64" aria-hidden="true"><line class="bot-l" x1="32" y1="6" x2="32" y2="14"/><circle class="bot-a" cx="32" cy="5" r="3.5"/><rect class="bot-b" x="10" y="14" width="44" height="34" rx="10"/><rect class="bot-v" x="16" y="22" width="32" height="16" rx="6"/><circle class="bot-e" cx="25" cy="30" r="3.5"/><circle class="bot-e" cx="39" cy="30" r="3.5"/><rect class="bot-a" x="3" y="26" width="6" height="11" rx="2"/><rect class="bot-a" x="55" y="26" width="6" height="11" rx="2"/><rect class="bot-b" x="24" y="50" width="16" height="9" rx="3"/></svg>
+</button>
+
+<div id="pal" hidden>
+  <div class="pal-box" role="dialog" aria-label="Command palette">
+    <input id="pal-in" type="text" placeholder="Type a command…" autocomplete="off" aria-label="Command">
+    <div id="pal-list"></div>
+    <div class="pal-f">↑↓ navigate · ↵ run · esc close</div>
+  </div>
+</div>
 
 <script>
 (function(){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
 
-  /* background node field */
-  const cv=document.getElementById('field'),cx=cv.getContext('2d');let W,H,pts=[];
-  function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;const n=Math.min(70,Math.floor(W*H/22000));
-    pts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25}));}
+  /* background constellation */
+  const cv=$('#field'),cx=cv.getContext('2d');let W,H,pts=[];
+  function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;const n=Math.min(55,Math.floor(W*H/26000));
+    pts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2}));}
   function draw(){cx.clearRect(0,0,W,H);
     for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;}
     for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);
-      if(d<140){cx.strokeStyle=`rgba(110,170,255,${.12*(1-d/140)})`;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();}}
-    cx.fillStyle='rgba(62,230,255,.55)';for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,1.4,0,7);cx.fill();}
+      if(d<130){cx.strokeStyle=`rgba(110,170,255,${.09*(1-d/130)})`;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();}}
+    cx.fillStyle='rgba(62,230,255,.4)';for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,1.2,0,7);cx.fill();}
     if(!reduce)requestAnimationFrame(draw);}
   size();draw();addEventListener('resize',()=>{size();if(reduce)draw();});
 
+  /* hero network globe */
+  (function(){const g=$('#globe'),c=g.getContext('2d');const N=46,P=[];
+    for(let i=0;i<N;i++){const y=1-2*(i+.5)/N,r=Math.sqrt(1-y*y),t=i*2.399963;P.push([Math.cos(t)*r,y,Math.sin(t)*r]);}
+    const E=[];for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const d=Math.hypot(P[i][0]-P[j][0],P[i][1]-P[j][1],P[i][2]-P[j][2]);if(d<.62)E.push([i,j]);}
+    let a=0;function fr(){const w=g.clientWidth,h=g.clientHeight;if(g.width!==w||g.height!==h){g.width=w;g.height=h;}const R=Math.min(w,h)*.36,ca=Math.cos(a),sa=Math.sin(a);
+      const Q=P.map(p=>{const x=p[0]*ca+p[2]*sa,z=-p[0]*sa+p[2]*ca,y=p[1]*.96+z*.26;return[w/2+x*R,h/2+y*R,z];});
+      c.clearRect(0,0,w,h);c.lineWidth=1;
+      for(const[i,j]of E){const o=.1+.22*((Q[i][2]+Q[j][2])/2+1)/2;c.strokeStyle=`rgba(62,230,255,${o})`;c.beginPath();c.moveTo(Q[i][0],Q[i][1]);c.lineTo(Q[j][0],Q[j][1]);c.stroke();}
+      for(const q of Q){c.fillStyle=q[2]>0?'rgba(155,123,255,.95)':'rgba(62,230,255,.45)';c.beginPath();c.arc(q[0],q[1],q[2]>0?2.2:1.4,0,7);c.fill();}
+      a+=.0035;if(!reduce)requestAnimationFrame(fr);}
+    fr();})();
+
   /* typed line */
   const lines=['> securing the edge with FortiGate','> hardening Microsoft 365 and Entra ID','> keeping every endpoint compliant','> automating ops with Python and agents'];
-  const el=document.getElementById('typed');let li=0,ci=0,del=false;
+  const el=$('#typed');let li=0,ci=0,del=false;
   function type(){const s=lines[li];if(reduce){el.textContent=s;return;}
     el.textContent=s.slice(0,ci);
     if(!del&&ci<s.length){ci++;setTimeout(type,45);}
@@ -388,76 +581,152 @@ footer{padding-block:48px;font-family:var(--f-mono);font-size:.72rem;color:var(-
     else{del=false;li=(li+1)%lines.length;setTimeout(type,300);}}
   type();
 
-  /* count-up stats */
-  document.querySelectorAll('[data-count]').forEach(b=>{const t=+b.dataset.count,s=b.dataset.suffix||'';
-    if(reduce){b.textContent=t+s;return;}let v=0;const step=()=>{v=Math.min(t,v+Math.ceil(t/30));b.textContent=v+s;if(v<t)requestAnimationFrame(step);};step();});
+  /* count-up */
+  $$('[data-count]').forEach(b=>{const t=+b.dataset.count;if(reduce){b.textContent=t;return;}let v=0;const step=()=>{v=Math.min(t,v+1);b.textContent=v;if(v<t)setTimeout(step,90);};step();});
 
-  /* swarm */
+  /* ---------- page build by agents ---------- */
+  const secs=$$('[data-build]'),itemsOf=s=>[...s.querySelectorAll('.sec-head,.card,.b')];
+  const names=['fw-agent','id-agent','ep-agent','soc-agent','cert-agent','nms-agent'];
+  const layer=$('#agents'),ags=names.map((n,i)=>{const d=document.createElement('div');d.className='ag '+(i%2?'v':'c');
+    d.innerHTML='<svg viewBox="0 0 16 16"><path d="M1 1l5 13 2.2-5.2L14 6.5z"/></svg><span>'+n+'</span>';layer.appendChild(d);return d;});
+  const hudT=$('#hud-t'),hudP=$('#hud-p'),hudB=$('#hud-b'),bub=$('#bub');
+  const canBuild=!reduce&&'IntersectionObserver' in window;
+  let total=0,done=0,queue=[],running=false,skip=false,io=null;
+  secs.forEach(s=>total+=itemsOf(s).length);
+  const pct=()=>hudP.textContent=Math.round(done/total*100)+'%';
+  const tagName=e=>{const c=[...e.classList].find(x=>!['card','b','on'].includes(x));return '<'+e.tagName.toLowerCase()+(c?'.'+c:'')+'> ✓';};
+  function place(a,x,y){a.style.opacity=1;a.style.transform=`translate(${Math.max(8,Math.min(innerWidth-90,x))}px,${Math.max(70,Math.min(innerHeight-70,y))}px)`;}
+  function flash(e,r,i){const t=document.createElement('div');t.className='btag'+(i%2?'':' c');t.textContent=tagName(e);
+    t.style.left=Math.max(8,Math.min(innerWidth-150,r.left))+'px';t.style.top=Math.max(64,Math.min(innerHeight-40,r.top-18))+'px';
+    document.body.appendChild(t);setTimeout(()=>t.remove(),950);}
+  async function build(s,fast){
+    const its=itemsOf(s).filter(e=>!e.classList.contains('on'));
+    if(!fast){s.classList.add('building');hudT.innerHTML='swarm · 6 agents · building <b>&lt;'+(s.id||'section')+'&gt;</b>';if(s.dataset.say)bub.textContent=s.dataset.say;}
+    for(let i=0;i<its.length;i++){const e=its[i];
+      if(!fast&&!skip){const r=e.getBoundingClientRect();
+        place(ags[i%ags.length],r.left+20+Math.random()*Math.max(20,r.width-120),r.top+10+Math.random()*Math.min(60,r.height));
+        place(ags[(i+3)%ags.length],r.left+r.width*Math.random()*.8,r.top+r.height*.5+Math.random()*40);
+        await wait(150);flash(e,r,i);}
+      e.classList.add('on');done++;pct();
+      if(!fast&&!skip)await wait(80);}
+    s.classList.remove('pend','building');s.dataset.built='1';
+  }
+  async function pump(){if(running)return;running=true;
+    while(queue.length){const s=queue.shift();await build(s,queue.length>0||skip);}
+    ags.forEach(a=>a.style.opacity=0);running=false;if(done>=total)finish();}
+  function finish(){hudT.innerHTML='<b>✓ build complete</b> · assembled by 6 agents';hudP.textContent='100%';hudB.textContent='↻ replay';bub.textContent='all systems nominal';}
+  function revealAll(){skip=true;queue=[];secs.forEach(s=>{itemsOf(s).forEach(e=>e.classList.add('on'));s.classList.remove('pend','building');s.dataset.built='1';});done=total;ags.forEach(a=>a.style.opacity=0);finish();}
+  function start(){
+    skip=false;done=0;queue=[];hudB.textContent='skip »';pct();
+    secs.forEach(s=>{delete s.dataset.built;itemsOf(s).forEach(e=>e.classList.remove('on'));
+      if(s.getBoundingClientRect().top>innerHeight*.85)s.classList.add('pend');});
+    if(io)io.disconnect();
+    io=new IntersectionObserver(es=>es.forEach(en=>{const s=en.target;if(en.isIntersecting&&!s.dataset.built&&!queue.includes(s)){queue.push(s);pump();}}),{threshold:.06,rootMargin:'0px 0px -12% 0px'});
+    secs.forEach(s=>io.observe(s));
+  }
+  if(canBuild)setTimeout(start,350);else{done=total;finish();}
+  hudB.onclick=()=>{if(done>=total&&canBuild){scrollTo({top:0,behavior:'instant'});setTimeout(start,reduce?0:500);}else revealAll();};
+  $('#replay').onclick=()=>{scrollTo({top:0,behavior:'instant'});if(canBuild)setTimeout(start,500);};
+
+  /* rail */
+  const rail=$('#rail'),rs=$$('section[id]');
+  rs.forEach(s=>{const a=document.createElement('a');a.href='#'+s.id;a.title=s.dataset.label||s.id;rail.appendChild(a);});
+  let tick=false;function onScroll(){if(tick)return;tick=true;requestAnimationFrame(()=>{tick=false;let k=-1;rs.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.45)k=i;});
+    [...rail.children].forEach((a,i)=>a.classList.toggle('act',i===k));});}
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  /* layer inspector */
+  const L=[['Edge','FortiGate firewalls with SD-WAN. Block lists, geo and web filtering, and VPN for remote users.'],
+    ['Cloud edge','Azure Firewall in the hub VNet. Spokes are segmented and reach the internet only through the hub.'],
+    ['Identity','Entra ID with Conditional Access. Trusted locations, compliant devices and MFA decide every sign-in.'],
+    ['Endpoint','Intune compliance, disk encryption and Defender on Windows, macOS and Linux.'],
+    ['Monitoring','Microsoft Sentinel for sign-in and threat signals, plus link and device health from the network monitor.']];
+  const lo=$('#lay-out'),lb=$$('.lay-btns button');
+  const setL=i=>{lb.forEach((b,j)=>b.setAttribute('aria-pressed',j===i));lo.innerHTML='<b>L'+(i+1)+' · '+L[i][0]+'.</b> '+L[i][1];};
+  lb.forEach((b,i)=>b.onclick=()=>setL(i));setL(0);
+
+  /* swarm demo */
   const NS='http://www.w3.org/2000/svg',C={x:260,y:220},R=165;
   const agents=[
-    {id:'fw',name:'Firewall',sub:'agent',job:'Reviews FortiGate and Azure Firewall policies, finds unused or over-broad rules and checks new IPs against the block list.',tasks:['policy audit','dedupe blocklist','shadow rules']},
-    {id:'id',name:'Identity',sub:'agent',job:'Scans Entra ID sign-ins for impossible travel, legacy auth and risky users, and checks Conditional Access coverage.',tasks:['risky sign-ins','CA coverage','stale accounts']},
-    {id:'ep',name:'Endpoint',sub:'agent',job:'Checks Intune compliance, encryption status and OS patch level across the fleet.',tasks:['compliance','encryption','patch level']},
-    {id:'soc',name:'SOC',sub:'agent',job:'Pulls new Sentinel incidents, groups related alerts and drafts a triage note for each.',tasks:['new incidents','correlate','triage notes']},
-    {id:'cert',name:'Cert',sub:'agent',job:'Tracks SSL certificate expiry on public hosts and raises a renewal task 30 days ahead.',tasks:['expiry scan','chain check','renewal due']},
-    {id:'nms',name:'NMS',sub:'agent',job:'Reads switch and link health from the monitor, flags interfaces with errors or high utilisation.',tasks:['link health','error counters','capacity']}
-  ];
-  const gL=document.getElementById('links'),gN=document.getElementById('nodes'),gP=document.getElementById('pulses');
+    {id:'fw',name:'Firewall',job:'Reviews FortiGate and Azure Firewall policies, finds unused or over-broad rules and checks new IPs against the block list.',tasks:['policy audit','dedupe blocklist','shadow rules']},
+    {id:'id',name:'Identity',job:'Scans Entra ID sign-ins for impossible travel, legacy auth and risky users, and checks Conditional Access coverage.',tasks:['risky sign-ins','CA coverage','stale accounts']},
+    {id:'ep',name:'Endpoint',job:'Checks Intune compliance, encryption status and OS patch level across the fleet.',tasks:['compliance','encryption','patch level']},
+    {id:'soc',name:'SOC',job:'Pulls new Sentinel incidents, groups related alerts and drafts a triage note for each.',tasks:['new incidents','correlate','triage notes']},
+    {id:'cert',name:'Cert',job:'Tracks SSL certificate expiry on public hosts and raises a renewal task 30 days ahead.',tasks:['expiry scan','chain check','renewal due']},
+    {id:'nms',name:'NMS',job:'Reads switch and link health from the monitor, flags interfaces with errors or high utilisation.',tasks:['link health','error counters','capacity']}];
+  const gL=$('#links'),gN=$('#nodes'),gP=$('#pulses');
   agents.forEach((a,i)=>{const ang=-Math.PI/2+i*2*Math.PI/agents.length;a.x=C.x+R*Math.cos(ang);a.y=C.y+R*Math.sin(ang);
     const l=document.createElementNS(NS,'line');l.setAttribute('class','link');l.setAttribute('x1',C.x);l.setAttribute('y1',C.y);l.setAttribute('x2',a.x);l.setAttribute('y2',a.y);gL.appendChild(l);});
   function node(x,y,r,t1,t2,cls){const g=document.createElementNS(NS,'g');g.setAttribute('class','node '+(cls||''));g.setAttribute('tabindex','0');
     g.innerHTML=`<circle class="ring" cx="${x}" cy="${y}" r="${r}"/><text x="${x}" y="${y-1}">${t1}</text><text class="sub" x="${x}" y="${y+12}">${t2}</text>`;gN.appendChild(g);return g;}
-  const orb=node(C.x,C.y,48,'Orchestrator','fan-out / fan-in','orb');
-  const insp=document.getElementById('inspect');
+  const orb=node(C.x,C.y,48,'Orchestrator','fan-out / fan-in','orb'),insp=$('#inspect');
   orb.addEventListener('mouseenter',()=>insp.innerHTML='<b>orchestrator</b><br>Splits the run into tasks, dispatches them in parallel and merges every result into one daily ops report.');
-  agents.forEach(a=>{a.el=node(a.x,a.y,36,a.name,a.sub);
-    const show=()=>insp.innerHTML=`<b>${a.name.toLowerCase()}.agent</b><br>${a.job}`;
+  agents.forEach(a=>{a.el=node(a.x,a.y,36,a.name,'agent');const show=()=>insp.innerHTML=`<b>${a.name.toLowerCase()}.agent</b><br>${a.job}`;
     a.el.addEventListener('mouseenter',show);a.el.addEventListener('focus',show);});
-
-  const log=document.getElementById('log'),st=document.getElementById('st'),btn=document.getElementById('deploy');
-  const mA=document.getElementById('m-a'),mC=document.getElementById('m-c'),mF=document.getElementById('m-f'),mT=document.getElementById('m-t');
-  const wait=ms=>new Promise(r=>setTimeout(r,reduce?0:ms));
+  const log=$('#log'),st=$('#st'),btn=$('#deploy'),mA=$('#m-a'),mC=$('#m-c'),mF=$('#m-f'),mT=$('#m-t');
+  const w2=ms=>wait(reduce?0:ms);
   function out(h){const d=document.createElement('div');d.innerHTML=h;log.appendChild(d);log.scrollTop=log.scrollHeight;}
   function pulse(x1,y1,x2,y2,color,dur){return new Promise(res=>{const c=document.createElementNS(NS,'circle');c.setAttribute('r',5);c.setAttribute('fill',color);c.style.filter=`drop-shadow(0 0 6px ${color})`;gP.appendChild(c);
     if(reduce){c.remove();return res();}const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/dur);c.setAttribute('cx',x1+(x2-x1)*k);c.setAttribute('cy',y1+(y2-y1)*k);if(k<1)requestAnimationFrame(f);else{c.remove();res();}})(t0);});}
-
   btn.onclick=async()=>{
     btn.disabled=true;log.innerHTML='';gP.innerHTML='';mA.textContent=0;mC.textContent=0;mF.textContent=0;
     agents.forEach(a=>a.el.setAttribute('class','node'));
     let checks=0,flags=0;const t0=performance.now();
-    const tick=setInterval(()=>mT.textContent=((performance.now()-t0)/1000).toFixed(1)+'s',100);
+    const tk=setInterval(()=>mT.textContent=((performance.now()-t0)/1000).toFixed(1)+'s',100);
     st.textContent='planning';out('<span class="a">orchestrator</span> received task: daily_ops_run');
-    await wait(500);out('<span class="a">orchestrator</span> split into 6 subtasks → fan-out');
+    await w2(500);out('<span class="a">orchestrator</span> split into 6 subtasks → fan-out');
     st.textContent='fan-out · agents working';
     const findings={fw:['3 duplicate IPs removed','1 rule never hit in 90d'],id:['0 risky sign-ins','CA covers all users'],ep:['2 devices missing patch','encryption 100%'],soc:['4 alerts → 1 incident','triage note drafted'],cert:['wildcard cert OK','renew due in 41d'],nms:['1 uplink 85% util','no CRC errors']};
     const flagged={fw:true,ep:true,nms:true};
     await Promise.all(agents.map(async(a,i)=>{
-      await wait(i*120);
-      await pulse(C.x,C.y,a.x,a.y,'#9b7bff',600);
+      await w2(i*120);await pulse(C.x,C.y,a.x,a.y,'#9b7bff',600);
       a.el.setAttribute('class','node busy');mA.textContent=+mA.textContent+1;
       out(`<span class="t">[${a.id}]</span> started: ${a.tasks.join(', ')}`);
-      for(const t of a.tasks){await wait(350+Math.random()*500);checks++;mC.textContent=checks;}
+      for(const t of a.tasks){await w2(350+Math.random()*500);checks++;mC.textContent=checks;}
       findings[a.id].forEach(f=>out(`<span class="t">[${a.id}]</span> ${f}`));
       if(flagged[a.id]){flags++;mF.textContent=flags;a.el.setAttribute('class','node flag');}else a.el.setAttribute('class','node done');
-      await pulse(a.x,a.y,C.x,C.y,flagged[a.id]?'#ff5c7a':'#4cf2a0',600);
-    }));
-    st.textContent='fan-in · merging';await wait(500);
+      await pulse(a.x,a.y,C.x,C.y,flagged[a.id]?'#ff5c7a':'#4cf2a0',600);}));
+    st.textContent='fan-in · merging';await w2(500);
     out(`<span class="a">orchestrator</span> merged ${checks} checks · <span class="warn">${flags} items need review</span>`);
     out('<span class="ok">✓ daily ops report ready · change tickets drafted for approval</span>');
-    st.textContent='done · report ready';clearInterval(tick);mT.textContent=((performance.now()-t0)/1000).toFixed(1)+'s';
-    setTimeout(()=>{mA.textContent=0;btn.disabled=false;btn.textContent='↻ Run again';},400);
+    st.textContent='done · report ready';clearInterval(tk);mT.textContent=((performance.now()-t0)/1000).toFixed(1)+'s';
+    setTimeout(()=>{btn.disabled=false;btn.textContent='↻ Run again';},400);
   };
 
   /* skill filters */
-  const fb=document.querySelectorAll('.filters button');
-  fb.forEach(b=>b.onclick=()=>{fb.forEach(x=>x.setAttribute('aria-pressed',x===b));const f=b.dataset.f;
-    document.querySelectorAll('.sk').forEach(s=>s.hidden=!(f==='all'||s.dataset.c===f));});
+  const fb=$$('.filters button');
+  fb.forEach(b=>b.onclick=()=>{fb.forEach(x=>x.setAttribute('aria-pressed',x===b));const f=b.dataset.f;$$('.sk').forEach(s=>s.hidden=!(f==='all'||s.dataset.c===f));});
 
-  /* copy */
-  document.getElementById('copy').onclick=async function(){const t=document.getElementById('mail').textContent;
-    try{await navigator.clipboard.writeText(t);this.textContent='Copied';}
-    catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById('mail'));const s=getSelection();s.removeAllRanges();s.addRange(r);this.textContent='Ctrl+C';}
-    setTimeout(()=>this.textContent='Copy',1600);};
+  /* copy email */
+  async function copyMail(b){const t=$('#mail').textContent;
+    try{await navigator.clipboard.writeText(t);if(b)b.textContent='Copied';}
+    catch(e){const r=document.createRange();r.selectNodeContents($('#mail'));const s=getSelection();s.removeAllRanges();s.addRange(r);if(b)b.textContent='Ctrl+C';}
+    if(b)setTimeout(()=>b.textContent='Copy',1600);}
+  $('#copy').onclick=function(){copyMail(this);};
+
+  /* command palette */
+  const pal=$('#pal'),pin=$('#pal-in'),pl=$('#pal-list');
+  const go=id=>()=>$('#'+id).scrollIntoView();
+  const cmds=[['Go to About','section',go('about')],['Go to Level-up log','section',go('growth')],['Go to Experience','section',go('experience')],['Go to Projects','section',go('projects')],
+    ['Deploy agent swarm','run demo',()=>{go('swarm')();setTimeout(()=>btn.click(),700);}],['Go to Skills','section',go('skills')],['Go to Certifications','section',go('certs')],['Go to Contact','section',go('contact')],
+    ['Copy email address','action',()=>{go('contact')();copyMail($('#copy'));}],['Rebuild site with agents','action',()=>$('#replay').click()],['Skip the build animation','action',revealAll]];
+  let sel=0,shown=[];
+  function render(){const q=pin.value.toLowerCase();shown=cmds.filter(c=>c[0].toLowerCase().includes(q));sel=Math.min(sel,Math.max(0,shown.length-1));
+    pl.innerHTML='';shown.forEach((c,i)=>{const b=document.createElement('button');b.className=i===sel?'sel':'';b.innerHTML=c[0]+'<span>'+c[1]+'</span>';b.onclick=()=>run(i);pl.appendChild(b);});}
+  function open(){pal.hidden=false;pin.value='';sel=0;render();pin.focus();}
+  function close(){pal.hidden=true;}
+  function run(i){const c=shown[i];close();if(c)c[2]();}
+  $('#kbtn').onclick=open;$('#bot').onclick=open;
+  pal.addEventListener('click',e=>{if(e.target===pal)close();});
+  pin.addEventListener('input',()=>{sel=0;render();});
+  addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();pal.hidden?open():close();return;}
+    if(pal.hidden)return;
+    if(e.key==='Escape')close();
+    else if(e.key==='ArrowDown'){e.preventDefault();sel=(sel+1)%Math.max(1,shown.length);render();}
+    else if(e.key==='ArrowUp'){e.preventDefault();sel=(sel-1+shown.length)%Math.max(1,shown.length);render();}
+    else if(e.key==='Enter'){e.preventDefault();run(sel);}
+  });
 })();
 </script>
 
